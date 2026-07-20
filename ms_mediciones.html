@@ -314,7 +314,10 @@ select.obs-in{cursor:pointer;-webkit-appearance:none;}
     <div class="ap active" id="disc-obra" onclick="setDisc('obra')">Obra civil</div>
     <div class="ap" id="disc-carp" onclick="setDisc('carpinteria')">Carpinteria</div>
   </div>
-  <div class="asc" id="areas-list"></div>
+  <div style="display:flex;align-items:center;gap:6px;padding:0 14px;">
+    <div class="asc" id="areas-list" style="flex:1;padding:0;"></div>
+    <button onclick="crearArea()" style="flex-shrink:0;background:var(--gold-bg);border:0.5px solid var(--gold-border);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--gold);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;white-space:nowrap;"><i class="ti ti-plus" style="font-size:13px;"></i>+ Área</button>
+  </div>
   <div class="sw"><div class="sb2"><i class="ti ti-search"></i><input type="text" placeholder="Buscar partida..." oninput="filterPartidas(this.value)"></div></div>
   <div class="sb" id="partidas-list"></div>
   <!-- Botón hoja semanal -->
@@ -547,6 +550,22 @@ async function loadAreas(){
     const d=document.createElement('div');d.className='ap';d.textContent=a.nombre;
     d.onclick=()=>setArea(d,a.nombre);cont.appendChild(d);
   });
+}
+
+async function crearArea(){
+  const nombre=prompt('Nombre del área:');
+  if(!nombre||!nombre.trim()) return;
+  const n=nombre.trim();
+  const orden=(cAreas.length||0)+1;
+  // Insertar en ambas disciplinas
+  const inserts=[
+    {obra_id:cObra,nombre:n,disciplina:'obra',orden},
+    {obra_id:cObra,nombre:n,disciplina:'carpinteria',orden}
+  ];
+  const{error}=await db.from('areas').insert(inserts);
+  if(error){showToast('Error: '+error.message);return;}
+  showToast('✓ Área "'+n+'" creada');
+  await loadAreas();
 }
 
 async function setDisc(d){
