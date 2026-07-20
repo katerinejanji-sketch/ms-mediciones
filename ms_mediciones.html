@@ -785,6 +785,7 @@ function renderMed(){
       <div><div class="tb-v" style="color:${alerta?'var(--red)':'var(--white)'}">${tot.toFixed(2)}</div><div class="tb-u">${p.unidad}</div></div>
     </div>
     ${stHtml}
+    <div class="ms2" style="margin-top:14px;"><div class="ms2-t">Contratista</div><input type="text" class="obs-in" id="contratista-txt" placeholder="Nombre del contratista" value="${cMedicion?.contratista||''}"></div>
     <div class="ms2" style="margin-top:14px;"><div class="ms2-t">Observaciones</div><textarea class="obs-in" rows="3" id="obs-txt" placeholder="Notas · referencia de plano...">${cMedicion?.observaciones||''}</textarea></div>
     <div class="ms2" style="margin-top:14px;"><div class="ms2-t">Registro fotográfico</div><div class="foto-row"><div class="foto-add" onclick="showToast('Disponible en app móvil nativa')"><i class="ti ti-camera"></i>Foto</div></div></div>
     <button class="save-btn" id="save-btn" onclick="saveMed()"><i class="ti ti-device-floppy"></i> Guardar medición</button>
@@ -814,11 +815,12 @@ async function saveMed(){
   const isCarp=cPart.disciplina==='carpinteria';
   const tot=calcTotDims(isCarp);
   const obs=document.getElementById('obs-txt')?.value||'';
+  const contratista=document.getElementById('contratista-txt')?.value||'';
   const st=cMedicion||{};
   let medId=cMedicion?.id;
   if(!medId){
     const{data,error}=await db.from('mediciones').insert({
-      partida_id:cPart.id,usuario_id:cUser.id,total:tot,observaciones:obs,
+      partida_id:cPart.id,usuario_id:cUser.id,total:tot,observaciones:obs,contratista,
       status_armado:st.status_armado||false,status_embalaje:st.status_embalaje||false,
       status_instalacion:st.status_instalacion||false,status_ajuste:st.status_ajuste||false
     }).select().single();
@@ -826,7 +828,7 @@ async function saveMed(){
     medId=data.id;cMedicion=data;
   }else{
     await db.from('mediciones').update({
-      total:tot,observaciones:obs,updated_at:new Date().toISOString(),
+      total:tot,observaciones:obs,contratista,updated_at:new Date().toISOString(),
       status_armado:st.status_armado||false,status_embalaje:st.status_embalaje||false,
       status_instalacion:st.status_instalacion||false,status_ajuste:st.status_ajuste||false
     }).eq('id',medId);
