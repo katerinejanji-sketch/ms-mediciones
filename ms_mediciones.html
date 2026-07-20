@@ -1317,7 +1317,10 @@ async function cargarPresupuestoObra(obraId, obraNombre) {
 
   const input = document.createElement('input');
   input.type = 'file'; input.accept = '.pdf';
+  input.style.cssText = 'position:fixed;top:-100px;left:-100px;opacity:0;';
+   document.body.appendChild(input);
   input.onchange = async (e) => {
+    document.body.removeChild(input);
     const file = e.target.files[0]; if(!file) return;
     showToast('Procesando PDF con IA...');
     const reader = new FileReader();
